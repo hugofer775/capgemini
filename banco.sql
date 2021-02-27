@@ -1,3 +1,5 @@
+CREATE DATABASE capgemini;
+
 CREATE TABLE pix(
 	id SERIAL PRIMARY KEY NOT NULL,
 	nome_destinatario VARCHAR(50) NOT NULL,
