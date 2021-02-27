@@ -1,19 +1,17 @@
 package com.capgemini.model.filtro;
 
-import java.time.LocalDate;
-
 public class PagamentoFiltro {
 	
-	private Long id;
+	private Long clienteId;
 	
 	private String data;
 
-	public Long getId() {
-		return id;
+	public Long getClienteId() {
+		return clienteId;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setClienteId(Long clienteId) {
+		this.clienteId = clienteId;
 	}
 
 	public String getData() {

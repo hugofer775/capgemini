@@ -12,6 +12,7 @@ import com.capgemini.model.entidade.Pix;
 @Repository
 public interface PagamentoRepository extends JpaRepository<Pix, Long>{
 
+	//Método consulta os pagamentos feitos do inicio ao fim do mês pelo cliente
 	@Query(value = "SELECT * FROM Pix p "
 			+ "INNER JOIN Cliente c ON p.cliente_id = c.id "
 			+ "WHERE DATE(p.data_pagamento) >= :dataInicio AND DATE(p.data_pagamento) <= :dataFim AND c.id = :id "

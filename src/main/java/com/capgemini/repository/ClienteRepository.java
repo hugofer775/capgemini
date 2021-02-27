@@ -11,6 +11,7 @@ import com.capgemini.model.entidade.Cliente;
 @Repository
 public interface ClienteRepository extends JpaRepository<Cliente, Long>{
 	
+	//Método consulta os clientes pelo cpf
 	@Query(value = "SELECT * from Cliente where cpf like %:cpf%", nativeQuery = true)
 	List<Cliente> buscaClientePorNome(String cpf);
 }
