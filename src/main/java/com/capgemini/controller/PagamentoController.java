@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.capgemini.model.entidade.Pix;
 import com.capgemini.model.filtro.PagamentoFiltro;
 import com.capgemini.model.in.PixIn;
+import com.capgemini.model.out.PixOut;
 import com.capgemini.service.PagamentoService;
 
 @RestController
@@ -26,26 +26,26 @@ public class PagamentoController {
 	
 	//Método responsavel por buscar os pagamentos de todos os clientes, com a porcentagem do valor pago em cada transação levando em conta o montante
 	@RequestMapping(method =  RequestMethod.GET) 
-	public List<Pix> lista() {
+	public List<PixOut> lista() {
 		return pagamentoService.buscaPagamentos();
 	}
 		
 	//Método responsavel por buscar pagamento pelo id
 	@RequestMapping(value = "/buscaPagamentoPorId/{id}", method =  RequestMethod.GET)
-	public ResponseEntity<Pix> buscaPorId(@PathVariable(value = "id") long id) {
+	public ResponseEntity<PixOut> buscaPorId(@PathVariable(value = "id") long id) {
 		return pagamentoService.buscaPagamentoPorId(id);
 	}
 	
 	//Método responsavel por salvar os pagamentos dos clientes e retorna dados do pagamento salvo
 	@RequestMapping(method =  RequestMethod.POST) 
 	@ResponseStatus(HttpStatus.CREATED)
-	public Pix salvaPagamento(@RequestBody PixIn pixIn) {
+	public PixOut salvaPagamento(@RequestBody PixIn pixIn) {
 		return pagamentoService.salvaPagamento(pixIn);
 	}
 		
 	//Método responsavel por buscar os pagamentos dos clientes usando data de referencia e o id do cliente, com a porcentagem do valor de cada pagamento levando em conta todos os pagamentos realizados pelo cliente no mês
 	@RequestMapping(value = "/buscaPagamentosPorDataEIdCliente", method =  RequestMethod.POST) 
-	public List<Pix> buscaPagamentosPorDataEIdCliente(@RequestBody PagamentoFiltro filtro) {
+	public List<PixOut> buscaPagamentosPorDataEIdCliente(@RequestBody PagamentoFiltro filtro) {
 		return pagamentoService.buscaPagamentosPorDataEIdCliente(filtro);
     }
 }

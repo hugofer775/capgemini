@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import com.capgemini.model.entidade.Cliente;
 import com.capgemini.model.entidade.Pix;
 import com.capgemini.model.filtro.PagamentoFiltro;
 import com.capgemini.model.in.PixIn;
+import com.capgemini.model.out.PixOut;
 import com.capgemini.repository.ClienteRepository;
 import com.capgemini.repository.PagamentoRepository;
 
@@ -30,16 +32,16 @@ public class PagamentoService {
 	@Autowired
 	private ClienteRepository clienteRepository;
 	
-	//Método salva o novo pagamento pix
-	public Pix salvaPagamento(PixIn pixIn) {
-		return pagamentoRepository.save(convertToEntity(pixIn));
+	//Método salva o novo pagamento pix e retorna o pagamento salvo
+	public PixOut salvaPagamento(PixIn pixIn) {
+		return convertToDto(pagamentoRepository.save(convertToEntity(pixIn)));
 	}
 	
 	//Método busca os dados do pagamento pelo id, se não existir pagamento com esse id retorna status 404 mostrando que pagamento com esse id não existe 
-	public ResponseEntity<Pix> buscaPagamentoPorId(long id) {
+	public ResponseEntity<PixOut> buscaPagamentoPorId(long id) {
 		Optional<Pix> pix = pagamentoRepository.findById(id);
 		if(pix.isPresent()){
-			return new ResponseEntity<Pix>(pix.get(), HttpStatus.OK);
+			return new ResponseEntity<PixOut>(convertToDto(pix.get()), HttpStatus.OK);
 		}
 		else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -47,16 +49,16 @@ public class PagamentoService {
 	}
 	
 	//Método traz todos os pagamentos realizados pelos clientes e as porcentagens pagos levanto em consideração todos os pagamentos
-	public List<Pix> buscaPagamentos() {
-		return calculaPorcentagem(pagamentoRepository.findAll());
+	public List<PixOut> buscaPagamentos() {
+		return calculaPorcentagem(pagamentoRepository.findAll()).stream().map(pix -> convertToDto(pix)).collect(Collectors.toList());
 	}
 	
 	// Método pega a data enviada em String e converte ela para LocalDate, em seguida pega o primeiro dia e ultimo dia do mês da data enviada, depois passa os paramentos para fazer a busca usando os o primeiro e ultimo dia do mês e o id do cliente para trazer os pagamentos feitos no mês da data enviada e a porcentagem do valor do pagamento levando em consideração todos os pagamentos realizados naquele mês
-	public List<Pix> buscaPagamentosPorDataEIdCliente(PagamentoFiltro filtro){
+	public List<PixOut> buscaPagamentosPorDataEIdCliente(PagamentoFiltro filtro){
 		LocalDate data = LocalDate.parse(filtro.getData(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 		LocalDate dataInicio = data.withDayOfMonth(1);
 		LocalDate dataFim = data.withDayOfMonth(data.lengthOfMonth());
-		return calculaPorcentagem(pagamentoRepository.buscarPagamentoPorData(dataInicio, dataFim, filtro.getClienteId()));
+		return calculaPorcentagem(pagamentoRepository.buscarPagamentoPorData(dataInicio, dataFim, filtro.getClienteId())).stream().map(pix -> convertToDto(pix)).collect(Collectors.toList());
 	}
 	
 	//Método responsavel por calcular porcentagens, primeiro somando todos os valores pagos e calculando a porcentagem paga pelo cliente naquela tranferencia 
@@ -78,4 +80,9 @@ public class PagamentoService {
 	    return pix;
 	}
 	
+	//Método responsável por converter entidade em Dto de saida
+	private PixOut convertToDto(Pix pix) {
+		ModelMapper modelMapper = new ModelMapper();
+	    return modelMapper.map(pix, PixOut.class);
+	}
 }
